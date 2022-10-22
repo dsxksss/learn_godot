@@ -7,7 +7,7 @@ const MAX_SPEED = 100
 # 移动的加速度
 const ACCELERATION = 10
 # 移动的摩擦力
-const FRICTION = 10
+const FRICTION = 25
 
 # gdscript 里下划线开头的函数
 # 表示回调函数
@@ -33,7 +33,7 @@ func _physics_process(delta:float) -> void:
 
 	if input_vec != Vector2.ZERO:
 		vec += input_vec * ACCELERATION * delta
-		vec = vec.clamped(MAX_SPEED * delta)
+		vec = vec.limit_length(MAX_SPEED * delta)
 	else :
 		vec = vec.move_toward(Vector2.ZERO, FRICTION * delta)
 	# move_and_collide用于更新该节点的位置
