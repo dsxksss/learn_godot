@@ -15,6 +15,8 @@ const FRICTION = 500 # 移动的摩擦力
 func _ready():
 	pass
 
+onready var animationPlayer = $AnimationPlayer
+
 # _physics_process函数会按帧死循环执行
 # 该函数一般用于处理视图的更新代码
 # 参数delta指的是上一帧花费的时间
@@ -31,6 +33,10 @@ func _physics_process(delta:float) -> void:
 	input_vec = input_vec.normalized()
 
 	if input_vec != Vector2.ZERO:
+		if input_vec.x > 0:
+			animationPlayer.play("RunRight")
+		else :
+			animationPlayer.play("RunLeft")
 		# 检测是否按下shift键
 		if Input.is_action_pressed("ui_fast_speed"):
 			# 如果为冲刺状态则移动速度加x倍
@@ -39,6 +45,7 @@ func _physics_process(delta:float) -> void:
 			# 正常状态移动速度不变
 			vec = vec.move_toward(input_vec * MAX_SPEED, ACCELERATION * delta)
 	else :
+		animationPlayer.play("IdleRight")
 		vec = vec.move_toward(Vector2.ZERO, FRICTION * delta)
 	# move_and_collide用于更新该节点的位置
 	# 也会处理一些移动和碰撞的函数,所以可以之间使用它
