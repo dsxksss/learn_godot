@@ -15,7 +15,11 @@ const FRICTION = 500 # 移动的摩擦力
 func _ready():
 	pass
 
-onready var animationPlayer = $AnimationPlayer
+# 动画树初始化
+onready var animationTree = $AnimationTree
+# 初始化该动画树状态器
+# 状态器是用来控制动画树中播放的动画
+onready var animationState = animationTree.get("parameters/playback")
 
 # _physics_process函数会按帧死循环执行
 # 该函数一般用于处理视图的更新代码
@@ -33,19 +37,22 @@ func _physics_process(delta:float) -> void:
 	input_vec = input_vec.normalized()
 
 	if input_vec != Vector2.ZERO:
-		if input_vec.x > 0:
-			animationPlayer.play("RunRight")
-		else :
-			animationPlayer.play("RunLeft")
+		# 注册动画树中的属性 "parameters/x/x",其内容为input_vec
+		# x -> 属性面板中对应的名字
+		animationTree.set("parameters/Idle/blend_position", input_vec)
+		animationTree.set("parameters/Run/blend_position", input_vec)
 		# 检测是否按下shift键
 		if Input.is_action_pressed("ui_fast_speed"):
+			# travel 函数作用是切换动画
+			animationState.travel("Run")
 			# 如果为冲刺状态则移动速度加x倍
 			vec = vec.move_toward(input_vec * MAX_SPEED * 1.8, ACCELERATION * 10 * delta)
 		else :
+			animationState.travel("Run")
 			# 正常状态移动速度不变
 			vec = vec.move_toward(input_vec * MAX_SPEED, ACCELERATION * delta)
 	else :
-		animationPlayer.play("IdleRight")
+		animationState.travel("Idle")
 		vec = vec.move_toward(Vector2.ZERO, FRICTION * delta)
 	# move_and_collide用于更新该节点的位置
 	# 也会处理一些移动和碰撞的函数,所以可以之间使用它
